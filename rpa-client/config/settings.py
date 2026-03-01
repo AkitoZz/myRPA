@@ -30,8 +30,8 @@ def _get_app_data_dir() -> Path:
 @dataclass
 class ServerConfig:
     """服务器配置"""
-    api_url: str = "http://localhost:8080/api"
-    ws_url: str = "ws://localhost:8080/ws"
+    api_url: str = "http://localhost:3000/api"
+    ws_url: str = "ws://localhost:3000/ws"
     heartbeat_interval: int = 30
     request_timeout: int = 15
     max_retries: int = 3

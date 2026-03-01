@@ -73,8 +73,18 @@ class WeChatVersionManager:
         r"C:\Program Files\Tencent\WeChat",
         r"D:\Program Files (x86)\Tencent\WeChat",
         r"D:\Program Files\Tencent\WeChat",
+        r"E:\Program Files (x86)\Tencent\WeChat",
+        r"E:\Program Files\Tencent\WeChat",
         r"D:\Tencent\WeChat",
         r"C:\Tencent\WeChat",
+        r"E:\Tencent\WeChat",
+        r"C:\WeChat",
+        r"D:\WeChat",
+        r"E:\WeChat",
+        r"C:\Program Files (x86)\WeChat",
+        r"C:\Program Files\WeChat",
+        r"D:\Program Files (x86)\WeChat",
+        r"D:\Program Files\WeChat",
     ]
 
     def __init__(self):
@@ -86,6 +96,40 @@ class WeChatVersionManager:
         if sys.platform != "win32":
             logger.warning("非Windows平台，无法检测微信安装路径")
             return None
+
+        # 优先从环境变量读取
+        env_path = os.environ.get("WECHAT_PATH")
+        if env_path and os.path.exists(os.path.join(env_path, "WeChat.exe")):
+            self._install_path = env_path
+            logger.info(f"从环境变量检测到微信安装路径: {env_path}")
+            return env_path
+
+        # 从配置文件读取
+        from config.settings import get_settings
+        settings = get_settings()
+        if settings.wechat.install_path and os.path.exists(
+            os.path.join(settings.wechat.install_path, "WeChat.exe")
+        ):
+            self._install_path = settings.wechat.install_path
+            logger.info(f"从配置文件检测到微信安装路径: {settings.wechat.install_path}")
+            return settings.wechat.install_path
+
+        # 从运行中的微信进程获取路径
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["wmic", "process", "where", "name='WeChat.exe'", "get", "ExecutablePath"],
+                capture_output=True, text=True, timeout=5,
+            )
+            for line in result.stdout.strip().splitlines():
+                line = line.strip()
+                if line and line.endswith("WeChat.exe") and os.path.exists(line):
+                    install_path = os.path.dirname(line)
+                    self._install_path = install_path
+                    logger.info(f"从运行进程检测到微信安装路径: {install_path}")
+                    return install_path
+        except Exception as e:
+            logger.debug(f"从进程获取微信路径失败: {e}")
 
         # 尝试从注册表读取
         try:
