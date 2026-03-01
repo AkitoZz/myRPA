@@ -301,14 +301,9 @@ class WeChatController:
 
                 time.sleep(1.0)
 
-                # 按回车选择第一个搜索结果（最可靠）
+                # 按回车选择第一个搜索结果（搜索面板会自动关闭）
                 pyautogui.press("enter")
-
-                time.sleep(0.5)
-
-                # 按 Escape 关闭搜索面板
-                pyautogui.press("escape")
-                time.sleep(0.3)
+                time.sleep(0.8)
 
                 logger.info(f"已打开聊天: {contact_name}")
                 return True
@@ -317,7 +312,6 @@ class WeChatController:
                 logger.error(f"打开聊天失败 (第{attempt + 1}次): {e}")
                 if attempt < max_retry - 1:
                     time.sleep(1)
-                    pyautogui.press("escape")
 
         return False
 
