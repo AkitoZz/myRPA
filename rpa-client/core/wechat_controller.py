@@ -187,20 +187,44 @@ class WeChatController:
         return self._locator.load_element_configs(config_path)
 
     def _ensure_foreground(self) -> bool:
-        """确保微信窗口在前台"""
-        if not self._connected or self._main_window is None:
+        """确保微信窗口在前台并获得焦点"""
+        if not self._connected or self._hwnd == 0:
             return False
 
         try:
             if IS_WINDOWS:
+                import ctypes
                 # 如果窗口最小化，先恢复
                 if win32gui.IsIconic(self._hwnd):
                     win32gui.ShowWindow(self._hwnd, win32con.SW_RESTORE)
-                    time.sleep(0.3)
+                    time.sleep(0.5)
 
-                # 置前
+                # 检查是否已经是前台窗口
+                if win32gui.GetForegroundWindow() == self._hwnd:
+                    return True
+
+                # 方法1：先用 Alt 键解除前台锁定，再 SetForegroundWindow
+                shell = ctypes.windll.user32
+                shell.keybd_event(0x12, 0, 0, 0)  # Alt key down
+                shell.keybd_event(0x12, 0, 2, 0)  # Alt key up
+                time.sleep(0.05)
                 win32gui.SetForegroundWindow(self._hwnd)
-                time.sleep(0.2)
+                time.sleep(0.3)
+
+                # 验证是否成功
+                if win32gui.GetForegroundWindow() == self._hwnd:
+                    return True
+
+                # 方法2：通过 ShowWindow 强制激活
+                win32gui.ShowWindow(self._hwnd, win32con.SW_SHOW)
+                win32gui.BringWindowToTop(self._hwnd)
+                time.sleep(0.3)
+
+                # 最终验证
+                foreground = win32gui.GetForegroundWindow()
+                if foreground != self._hwnd:
+                    logger.warning(f"窗口置前可能失败: 当前前台={foreground}, 目标={self._hwnd}")
+
             return True
         except Exception as e:
             logger.error(f"无法将微信窗口置前: {e}")
@@ -221,14 +245,21 @@ class WeChatController:
 
         for attempt in range(max_retry):
             try:
-                self._ensure_foreground()
+                if not self._ensure_foreground():
+                    logger.warning("无法将微信置前，跳过本次搜索")
+                    continue
                 smart_delay()
 
-                # 点击搜索框 - 使用 Ctrl+F 快捷键更可靠
-                if IS_WINDOWS:
-                    pyautogui.hotkey("ctrl", "f")
-                else:
-                    pyautogui.hotkey("command", "f")
+                # 先点击微信窗口确保焦点在微信上
+                if IS_WINDOWS and self._hwnd:
+                    rect = win32gui.GetWindowRect(self._hwnd)
+                    center_x = (rect[0] + rect[2]) // 2
+                    center_y = (rect[1] + rect[3]) // 2
+                    self._click_at(center_x, center_y)
+                    time.sleep(0.2)
+
+                # 使用 Ctrl+F 快捷键打开搜索
+                pyautogui.hotkey("ctrl", "f")
                 time.sleep(0.5)
 
                 # 清除已有内容
@@ -305,15 +336,25 @@ class WeChatController:
 
         for attempt in range(max_retry):
             try:
-                self._ensure_foreground()
+                if not self._ensure_foreground():
+                    logger.warning("无法将微信置前，跳过本次发送")
+                    continue
                 smart_delay()
 
                 # 点击输入框：直接点击窗口下半部分（输入框固定在底部）
                 if IS_WINDOWS and self._hwnd:
+                    # 每次重新获取窗口位置（窗口可能被移动）
                     rect = win32gui.GetWindowRect(self._hwnd)
                     input_x = (rect[0] + rect[2]) // 2  # 窗口水平中间
                     input_y = rect[3] - 120              # 距底部120px
                     self._click_at(input_x, input_y)
+                    time.sleep(0.2)
+
+                    # 再次确认焦点还在微信上
+                    if win32gui.GetForegroundWindow() != self._hwnd:
+                        logger.warning("点击后焦点丢失，重新置前")
+                        self._ensure_foreground()
+                        time.sleep(0.3)
                 time.sleep(0.3)
 
                 # 清除已有内容
