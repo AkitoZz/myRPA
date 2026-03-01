@@ -1,0 +1,232 @@
+{
+  "version": "3.9.10",
+  "description": "微信PC版3.9.10 UI元素配置",
+  "updated_at": "2024-01-01",
+  "window": {
+    "class_name": "WeChatMainWndForPC",
+    "title": "微信",
+    "login_class": "WeChatLoginWndForPC"
+  },
+  "elements": {
+    "search_box": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Edit",
+        "name": "搜索"
+      },
+      "image": "search_box.png",
+      "ocr_text": "搜索",
+      "description": "主界面搜索框"
+    },
+    "search_result_first": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "ListItem",
+        "name": ""
+      },
+      "image": "search_result_first.png",
+      "description": "搜索结果第一项"
+    },
+    "chat_input": {
+      "uia": {
+        "auto_id": "EditMsg",
+        "control_type": "Edit",
+        "name": ""
+      },
+      "image": "chat_input.png",
+      "description": "聊天输入框"
+    },
+    "send_button": {
+      "uia": {
+        "auto_id": "btn_send",
+        "control_type": "Button",
+        "name": "发送(S)"
+      },
+      "image": "send_button.png",
+      "ocr_text": "发送",
+      "description": "发送按钮"
+    },
+    "contact_tab": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "通讯录"
+      },
+      "image": "contact_tab.png",
+      "ocr_text": "通讯录",
+      "description": "通讯录标签"
+    },
+    "chat_tab": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "聊天"
+      },
+      "image": "chat_tab.png",
+      "ocr_text": "聊天",
+      "description": "聊天标签"
+    },
+    "add_friend_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "添加到通讯录"
+      },
+      "image": "add_friend_button.png",
+      "ocr_text": "添加到通讯录",
+      "description": "添加好友按钮"
+    },
+    "friend_request_greeting": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Edit",
+        "name": ""
+      },
+      "image": "friend_request_greeting.png",
+      "description": "好友请求验证消息输入框"
+    },
+    "send_request_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "确定"
+      },
+      "image": "send_request_button.png",
+      "ocr_text": "确定",
+      "description": "发送好友请求确定按钮"
+    },
+    "new_message_indicator": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Text",
+        "name": ""
+      },
+      "image": "new_message_indicator.png",
+      "description": "新消息红点指示器"
+    },
+    "accept_friend_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "接受"
+      },
+      "image": "accept_friend_button.png",
+      "ocr_text": "接受",
+      "description": "接受好友请求按钮"
+    },
+    "group_invite_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "+"
+      },
+      "image": "group_invite_button.png",
+      "description": "群邀请成员按钮（+号）"
+    },
+    "invite_search_box": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Edit",
+        "name": "搜索"
+      },
+      "image": "invite_search_box.png",
+      "description": "邀请成员搜索框"
+    },
+    "confirm_invite_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "确定"
+      },
+      "image": "confirm_invite_button.png",
+      "ocr_text": "确定",
+      "description": "确认邀请按钮"
+    },
+    "remove_member_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "-"
+      },
+      "image": "remove_member_button.png",
+      "description": "移除群成员按钮（-号）"
+    },
+    "confirm_remove_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "确定"
+      },
+      "image": "confirm_remove_button.png",
+      "description": "确认移除按钮"
+    },
+    "group_notice": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "群公告"
+      },
+      "image": "group_notice.png",
+      "ocr_text": "群公告",
+      "description": "群公告入口"
+    },
+    "publish_notice_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "发布"
+      },
+      "image": "publish_notice_button.png",
+      "ocr_text": "发布",
+      "description": "发布群公告按钮"
+    },
+    "view_all_members": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "查看全部"
+      },
+      "image": "view_all_members.png",
+      "ocr_text": "查看全部",
+      "description": "查看全部群成员按钮"
+    },
+    "file_transfer": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "ListItem",
+        "name": "文件传输助手"
+      },
+      "image": "file_transfer.png",
+      "ocr_text": "文件传输助手",
+      "description": "文件传输助手"
+    },
+    "moments_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "朋友圈"
+      },
+      "image": "moments_button.png",
+      "ocr_text": "朋友圈",
+      "description": "朋友圈入口"
+    },
+    "mini_program_tab": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "小程序"
+      },
+      "image": "mini_program_tab.png",
+      "description": "小程序标签"
+    },
+    "settings_button": {
+      "uia": {
+        "auto_id": "",
+        "control_type": "Button",
+        "name": "设置及其他"
+      },
+      "image": "settings_button.png",
+      "description": "设置按钮"
+    }
+  }
+}
