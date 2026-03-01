@@ -4,6 +4,7 @@
   "updated_at": "2024-01-01",
   "window": {
     "class_name": "WeChatMainWndForPC",
+    "class_name_qt": "Qt51514QWindowIcon",
     "title": "微信",
     "login_class": "WeChatLoginWndForPC"
   },

@@ -44,6 +44,7 @@ class WeChatController:
     """微信窗口控制器"""
 
     WECHAT_CLASS_NAME = "WeChatMainWndForPC"
+    WECHAT_CLASS_NAME_QT = "Qt51514QWindowIcon"
     WECHAT_TITLE = "微信"
 
     def __init__(self):
@@ -86,19 +87,29 @@ class WeChatController:
             return None
 
         try:
+            # 方案1：经典类名
             hwnds = find_windows(class_name=self.WECHAT_CLASS_NAME)
             if hwnds:
                 self._hwnd = hwnds[0]
-                logger.info(f"找到微信窗口: hwnd={self._hwnd}")
+                logger.info(f"找到微信窗口(经典): hwnd={self._hwnd}")
                 return self._hwnd
 
-            # 备选方案：通过窗口标题查找
+            # 方案2：新版微信 Qt 类名 + 标题匹配
+            hwnds = find_windows(class_name=self.WECHAT_CLASS_NAME_QT)
+            for hwnd in hwnds:
+                title = win32gui.GetWindowText(hwnd)
+                if title == self.WECHAT_TITLE:
+                    self._hwnd = hwnd
+                    logger.info(f"找到微信窗口(Qt): hwnd={self._hwnd}, title={title}")
+                    return self._hwnd
+
+            # 方案3：通过窗口标题兜底
             hwnds = find_windows(title=self.WECHAT_TITLE)
             for hwnd in hwnds:
                 class_name = win32gui.GetClassName(hwnd)
-                if "WeChat" in class_name:
+                if "WeChat" in class_name or "Qt" in class_name:
                     self._hwnd = hwnd
-                    logger.info(f"通过标题找到微信窗口: hwnd={self._hwnd}")
+                    logger.info(f"通过标题找到微信窗口: hwnd={self._hwnd}, class={class_name}")
                     return self._hwnd
 
             logger.warning("未找到微信窗口")
@@ -135,8 +146,10 @@ class WeChatController:
                 self._app = Application(backend="uia").connect(process=pid_found)
                 self._pid = pid_found
 
-            # 获取主窗口
+            # 获取主窗口（兼容经典和Qt新版）
             self._main_window = self._app.window(class_name=self.WECHAT_CLASS_NAME)
+            if not self._main_window.exists(timeout=3):
+                self._main_window = self._app.window(class_name=self.WECHAT_CLASS_NAME_QT, title=self.WECHAT_TITLE)
 
             if not self._main_window.exists(timeout=5):
                 logger.error("微信主窗口不存在或无法访问")
