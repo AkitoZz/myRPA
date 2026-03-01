@@ -270,13 +270,8 @@ class WeChatController:
 
                 time.sleep(1.0)
 
-                # 点击第一个搜索结果
-                result = self._locator.locate_by_name("search_result_first", retry=2)
-                if result.found:
-                    self._click_at(result.x, result.y)
-                else:
-                    # 备选：按回车选择第一个结果
-                    pyautogui.press("enter")
+                # 按回车选择第一个搜索结果（最可靠）
+                pyautogui.press("enter")
 
                 time.sleep(0.5)
 
@@ -313,18 +308,12 @@ class WeChatController:
                 self._ensure_foreground()
                 smart_delay()
 
-                # 点击输入框
-                result = self._locator.locate_by_name("chat_input", retry=1)
-                if result.found:
-                    self._click_at(result.center[0], result.center[1])
-                else:
-                    # 备选方案：点击窗口下方区域（输入框通常在底部）
-                    if self._main_window:
-                        rect = self._main_window.rectangle()
-                        input_x = rect.left + rect.width() // 2
-                        input_y = rect.bottom - 100
-                        self._click_at(input_x, input_y)
-
+                # 点击输入框：直接点击窗口下半部分（输入框固定在底部）
+                if IS_WINDOWS and self._hwnd:
+                    rect = win32gui.GetWindowRect(self._hwnd)
+                    input_x = (rect[0] + rect[2]) // 2  # 窗口水平中间
+                    input_y = rect[3] - 120              # 距底部120px
+                    self._click_at(input_x, input_y)
                 time.sleep(0.3)
 
                 # 清除已有内容
@@ -335,12 +324,8 @@ class WeChatController:
                 self._type_text(text)
                 smart_delay()
 
-                # 发送：按Enter或点击发送按钮
-                result = self._locator.locate_by_name("send_button", retry=1)
-                if result.found:
-                    self._click_at(result.center[0], result.center[1])
-                else:
-                    pyautogui.press("enter")
+                # 发送：直接按Enter（最可靠的方式）
+                pyautogui.press("enter")
 
                 time.sleep(0.3)
                 logger.info(f"消息已发送: {text[:50]}{'...' if len(text) > 50 else ''}")
