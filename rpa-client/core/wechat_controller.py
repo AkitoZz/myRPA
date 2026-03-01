@@ -135,7 +135,7 @@ class WeChatController:
         try:
             if pid is not None:
                 # 通过PID连接
-                self._app = Application(backend="uia").connect(process=pid)
+                self._app = Application(backend="win32").connect(process=pid)
                 self._pid = pid
             else:
                 # 自动查找
@@ -146,12 +146,10 @@ class WeChatController:
                 self._app = Application(backend="uia").connect(process=pid_found)
                 self._pid = pid_found
 
-            # 获取主窗口（兼容经典和Qt新版）
-            self._main_window = self._app.window(class_name=self.WECHAT_CLASS_NAME)
-            if not self._main_window.exists(timeout=3):
-                self._main_window = self._app.window(class_name=self.WECHAT_CLASS_NAME_QT, title=self.WECHAT_TITLE)
+            # 获取主窗口（直接用已找到的句柄，跳过慢速搜索）
+            self._main_window = self._app.window(handle=self._hwnd)
 
-            if not self._main_window.exists(timeout=5):
+            if not self._main_window.exists(timeout=2):
                 logger.error("微信主窗口不存在或无法访问")
                 return False
 
@@ -603,20 +601,8 @@ class WeChatController:
                 self._click_at(result.center[0], result.center[1])
                 time.sleep(0.5)
 
-            # 通过UIA获取聊天列表项
-            if self._main_window and PYWINAUTO_AVAILABLE:
-                try:
-                    # 尝试获取列表控件中的子项
-                    list_items = self._main_window.descendants(control_type="ListItem")
-                    for item in list_items[:count]:
-                        try:
-                            name = item.window_text()
-                            if name and name.strip():
-                                chat_list.append(name.strip())
-                        except Exception:
-                            continue
-                except Exception as e:
-                    logger.debug(f"通过UIA获取聊天列表失败: {e}")
+            # 注意: descendants() 在新版Qt微信上极慢，暂用截图+OCR替代
+            logger.debug("聊天列表通过截图识别获取")
 
             logger.info(f"获取到 {len(chat_list)} 个聊天记录")
 
@@ -660,7 +646,7 @@ class WeChatController:
                 if self._main_window and PYWINAUTO_AVAILABLE:
                     try:
                         accept_btn = self._main_window.child_window(title="接受", control_type="Button")
-                        if accept_btn.exists(timeout=2):
+                        if accept_btn.exists(timeout=0.5):
                             accept_btn.click_input()
                             logger.info("已接受好友请求(UIA)")
                             return True

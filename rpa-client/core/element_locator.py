@@ -260,7 +260,7 @@ class ElementLocator:
             # 查找元素
             element = self._window.child_window(**search_criteria)
 
-            if element.exists(timeout=2):
+            if element.exists(timeout=0.5):
                 rect = element.rectangle()
                 result = LocateResult(
                     found=True,
